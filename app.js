@@ -1,5 +1,6 @@
 const { Telegraf } = require('telegraf');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const https = require('https')
 
@@ -330,7 +331,7 @@ bot.action('reviews', (ctx) => {
 // Presentation Handler
 bot.action('presentation', async (ctx) => {
     const fileUrl = 'https://arcanedevlab.ru/static/N-KUDRINA-presentation-v2.pdf';
-    const filePath = path.join(__dirname, 'N-KUDRINA-presentation.pdf');
+    const filePath = path.join(os.tmpdir(), 'N-KUDRINA-presentation.pdf');
 
     ctx.reply('Производится отправка файла. Ожидайте, пожалуйста');
 
