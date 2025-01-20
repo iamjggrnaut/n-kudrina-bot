@@ -329,37 +329,38 @@ bot.action('reviews', (ctx) => {
 
 // Presentation Handler
 bot.action('presentation', async (ctx) => {
-    const fileUrl = 'https://arcanedevlab.ru/static/N-KUDRINA-presentation.pdf';
+    const fileUrl = 'https://arcanedevlab.ru/static/N-KUDRINA-presentation-v2.pdf';
     const filePath = path.join(__dirname, 'N-KUDRINA-presentation.pdf');
 
     ctx.reply('Производится отправка файла. Ожидайте, пожалуйста');
 
-    https.get(fileUrl, (res) => {
-        if (res.statusCode === 200) {
-            const fileStream = fs.createWriteStream(filePath);
-            res.pipe(fileStream);
+    try {
+        const response = await new Promise((resolve, reject) => {
+            https.get(fileUrl, (res) => {
+                if (res.statusCode === 200) {
+                    const fileStream = fs.createWriteStream(filePath);
+                    res.pipe(fileStream);
 
-            fileStream.on('finish', async () => {
-                try {
-                    // Отправляем файл в Telegram
-                    await ctx.replyWithDocument({ source: filePath, filename: 'N-KUDRINA Presentation.pdf' });
-
-                    // Удаляем файл после отправки, если он не нужен
-                    fs.unlinkSync(filePath);
-
-                } catch (err) {
-                    console.error('Ошибка при отправке файла:', err);
-                    ctx.reply('Произошла ошибка при отправке файла. Пожалуйста, попробуйте позже.');
+                    fileStream.on('finish', () => {
+                        fileStream.close();
+                        resolve(filePath);
+                    });
+                    fileStream.on('error', reject);
+                } else {
+                    reject(new Error(`Ошибка при загрузке файла: ${res.statusCode}`));
                 }
-            });
-        } else {
-            console.error('Ошибка при загрузке файла:', res.statusCode);
-            ctx.reply('Не удалось загрузить файл. Пожалуйста, попробуйте позже.');
-        }
-    }).on('error', (err) => {
-        console.error('Ошибка при скачивании файла:', err);
-        ctx.reply('Произошла ошибка при скачивании файла. Пожалуйста, попробуйте позже.');
-    });
+            }).on('error', reject);
+        });
+
+        await ctx.replyWithDocument({ source: response, filename: 'N-KUDRINA Presentation.pdf' });
+
+        // Удаляем файл после отправки, если он не нужен
+        fs.unlinkSync(response);
+
+    } catch (err) {
+        console.error('Ошибка при отправке файла:', err);
+        ctx.reply('Произошла ошибка при отправке файла. Пожалуйста, попробуйте позже.');
+    }
 });
 
 // Reminder Functionality Placeholder
