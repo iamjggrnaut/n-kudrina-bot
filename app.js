@@ -13,6 +13,25 @@ let userData = {};
 
 // Command: Start
 bot.start((ctx) => {
+
+    const user = ctx.from;
+    const userId = user.id;
+    const userName = user.first_name;
+    const userLastName = user.last_name || ''; // Если фамилия есть, используем ее, иначе пустая строка
+    const userUsername = user.username || ''; // Если username есть, используем его, иначе пустая строка
+    const userLanguageCode = user.language_code || ''; // Если language code есть, используем его, иначе пустая строка
+   
+
+    const managerMessage = `Пользователь, контактировавший с ботом:
+    Фамилия и имя: ${userLastName} ${userName}
+    Никнейм: ${userUsername}
+    Ссылка на профиль: ${userUsername ? 'https://t.me/'+userUsername : 'отсутствует'}
+    `;
+    // Replace with manager's chat ID
+    const MANAGER_CHAT_ID = '-4607631918';
+    bot.telegram.sendMessage(MANAGER_CHAT_ID, managerMessage);
+    
+
     ctx.reply(`Здравствуйте! Я бот N-KUDRINA. Я помогу вам узнать о наших курсах и записаться. Что вас интересует?`, {
         reply_markup: {
             inline_keyboard: [
