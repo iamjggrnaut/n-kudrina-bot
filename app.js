@@ -1,6 +1,5 @@
 const { Telegraf } = require('telegraf');
 const fs = require('fs');
-const fetch = require('node-fetch')
 const path = require('path');
 const https = require('https')
 
